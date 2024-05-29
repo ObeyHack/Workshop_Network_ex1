@@ -43,7 +43,7 @@ make all
 
 ## Run
 ```bash
-./server 132.65.164.101
-./client
+./server 
+./client 132.65.164.101
 ```
 
