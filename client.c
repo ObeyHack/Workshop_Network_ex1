@@ -3,10 +3,13 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/time.h>
 
 
 #define SEVER_IP "10.0.2.15"
-#define SERVER_PORT 7000
+#define SERVER_PORT 7005
+#define MEGABIT 10000
+
 //What do you need to measure?
 //You need to measure throughput between two machines, for exponential series of message sizes,
 //ranging from 1 byte to 1MB. Throughput is the highest possible transmission rate with that message
@@ -15,8 +18,15 @@
 //In order to measure throughput you need code both for a server and a client (try to make them share as
 //much code as possible). You run your server first and the client second, the client connects to the server
 //and sends X messages (you decide how many, and explain your decision in a comment inside the code),
- //the server replies after all X have arrived, and the client calculates the throughput based on the time it
- //all took (you can ignore the reply in your calculation)
+//the server replies after all X have arrived, and the client calculates the throughput based on the time it
+//all took (you can ignore the reply in your calculation)
+int warmup(int client_socket, int sizeofpacket) {
+    char message[MEGABIT];
+    for (int i = 0; i < 1000; i++) {
+        send(client_socket, &message, sizeofpacket, 0);
+    }
+    return 0;
+}
 
 int main(int argc, char *argv[]) {
     printf("Running client...");
@@ -30,18 +40,45 @@ int main(int argc, char *argv[]) {
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(SERVER_PORT);
     server_address.sin_addr.s_addr = inet_addr(SEVER_IP);
-    int connection_status = connect(client_socket, (struct sockaddr *)&server_address, sizeof(server_address));
+    int connection_status = connect(client_socket, (struct sockaddr *) &server_address, sizeof(server_address));
     if (connection_status == -1) {
         printf("Error connecting to server\n");
         return 1;
     }
-    //send 1000 warmup messages of 8 bytes
-    //for (int i = 0; i < 1000; i++) {
-    //    char message[8] = "aaaaaaaa";
-    //    send(client_socket, message, sizeof(message), 0);
-    //}
+
     //send message to sever
-    char message[5] = "hello";
-    send(client_socket, message, sizeof(message), 0);
+    struct timeval start, end;
+    double troughputs[MEGABIT] = {0};
+    int number_of_messages = 1000;
+
+
+
+
+    gettimeofday(&start, NULL);
+    char packet[MEGABIT] = {0};
+    char recive[MEGABIT] = {0};
+
+    for (int i = 1; i < MEGABIT; i++) {
+        //printf("Sending %d bytes\n", i);
+        warmup(client_socket, i);
+        gettimeofday(&start, NULL);
+        for (int j = 0; j < number_of_messages; j++) {
+            send(client_socket, packet, i, 0);
+            //printf("sent %d bytes %d\n", i, j);
+        }
+        //receive the reply
+        recv(client_socket, recive, i, 0);
+        gettimeofday(&end, NULL);
+        //calc troughput
+        long mic = (end.tv_sec - start.tv_sec) * 1000000 + end.tv_usec - start.tv_usec;
+        long total_time = mic;
+        double troughput = ((double) number_of_messages * i) /(double)total_time;
+        troughputs[i] = troughput;
+    }
+    for (int i = 1; i < MEGABIT; i++) {
+        printf("Troughput for %d bytes is %f\n", i, troughputs[i]);
+    }
+
+
     return 0;
 }
