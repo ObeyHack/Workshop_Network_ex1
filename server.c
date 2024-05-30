@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/time.h>
+#include <stdbool.h>
 //What do you need to measure?
 //You need to measure throughput between two machines, for exponential series of message sizes,
 //ranging from 1 byte to 1MB. Throughput is the highest possible transmission rate with that message
@@ -14,11 +15,10 @@
 //and sends X messages (you decide how many, and explain your decision in a comment inside the code),
 //the server replies after all X have arrived, and the client calculates the throughput based on the time it
 //all took (you can ignore the reply in your calculation)
-#define SERVER_PORT 7005
-#define SERVER_IP "10.0.2.15"
-#define CLIENT_IP "0.0.0.0"
-#define CLIENT_PORT 8081
+#define SERVER_PORT 7777
 #define MEGABIT 1024
+
+
 int warmup(int client_socket, int sizeofpacket) {
     char message[MEGABIT];
     for (int i = 0; i < 1000; i++) {
@@ -26,16 +26,9 @@ int warmup(int client_socket, int sizeofpacket) {
     }
     return 0;
 }
-int main()
-{
-    printf("Running server...");
-    //create a socket
-    int server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_socket == -1)
-    {
-        printf("Error creating socket\n");
-        return 1;
-    }
+
+
+bool bind_server(int server_socket) {
     //define the server address
     struct sockaddr_in server_address;
     server_address.sin_family = AF_INET;
@@ -44,11 +37,29 @@ int main()
     //bind the socket to our specified IP and port
     if(bind(server_socket, (struct sockaddr *)&server_address, sizeof(server_address)) !=0)
     {
-        printf("Error binding socket\n");
-        return 1;
+        return false;
     }
+    return true;
+}
+
+int main()
+{
+    printf("Running server...");
+    //create a socket
+    int server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket == -1)
+    {
+        printf("Error creating socket\n");
+        exit(1);
+    }
+
+    if (!bind_server(server_socket)) {
+        printf("Error binding socket\n");
+        exit(1);
+    }
+
     //listen for connections
-    listen(server_socket, 5);
+    listen(server_socket, 1);
     //accept the connection
     int client_socket = accept(server_socket, NULL, NULL);
     //receive 1000 messages of 8 bytes as a warmup

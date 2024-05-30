@@ -4,12 +4,12 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/time.h>
+#include <stdbool.h>
+#include <unistd.h>
 
-
-#define SEVER_IP2 "10.0.2.15"
-#define SEVER_IP "132.164.164.101"
 #define SERVER_PORT 7005
 #define MEGABIT 1024
+#define MSG_COUNT 1000
 
 //What do you need to measure?
 //You need to measure throughput between two machines, for exponential series of message sizes,
@@ -29,57 +29,66 @@ int warmup(int client_socket, int sizeofpacket) {
     return 0;
 }
 
-int main(int argc, char *argv[]) {
-    printf("Running client...");
-    //connect to server
-    int client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (client_socket == -1) {
-        printf("Error creating socket\n");
-        return 1;
-    }
+
+bool connect_to_server(int client_socket, char* ip) {
     struct sockaddr_in server_address;
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(SERVER_PORT);
-    server_address.sin_addr.s_addr = inet_addr(SEVER_IP);
+    server_address.sin_addr.s_addr = inet_addr(ip);
     int connection_status = connect(client_socket, (struct sockaddr *) &server_address, sizeof(server_address));
-    if (connection_status == -1) {
-        printf("Error connecting to server\n");
-        return 1;
+    if (connection_status != -1) {
+        printf("Connected to server\n");
+        return true;
     }
+    return false;
+}
 
-    //send message to sever
+
+double send_data(int client_socket, int size){
     struct timeval start, end;
-    double troughputs[MEGABIT] = {0};
-    int number_of_messages = 1000;
-
-
-
-
-    gettimeofday(&start, NULL);
     char packet[MEGABIT] = {0};
     char recive[MEGABIT] = {0};
 
+
+    warmup(client_socket, size);
+    gettimeofday(&start, NULL);
+    for (int j = 0; j < MSG_COUNT; j++) {
+        send(client_socket, packet, size, 0);
+    }
+    //receive the reply
+    recv(client_socket, recive, size, 0);
+    gettimeofday(&end, NULL);
+    //calc troughput
+    long total_time = (end.tv_sec - start.tv_sec) * 1000000 + end.tv_usec - start.tv_usec;
+    double troughput = ((double) MSG_COUNT * size) /(double)total_time;
+    return troughput;
+}
+
+
+int main(int argc, char *argv[]) {
+    printf("Running client...");
+    char* ip = argv[1];
+
+    // create socket
+    int client_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (client_socket == -1) {
+        printf("Error creating socket\n");
+        exit(1);
+    }
+
+    if (!connect_to_server(client_socket, ip)) {
+        printf("Error connecting to server\n");
+        exit(1);
+    }
+
+    //send message to sever
+    double troughputs[MEGABIT] = {0};
     for (int i = 1; i < MEGABIT; i=i*2) {
         //printf("Sending %d bytes\n", i);
-        warmup(client_socket, i);
-        gettimeofday(&start, NULL);
-        for (int j = 0; j < number_of_messages; j++) {
-            send(client_socket, packet, i, 0);
-            //printf("sent %d bytes %d\n", i, j);
-        }
-        //receive the reply
-        recv(client_socket, recive, i, 0);
-        gettimeofday(&end, NULL);
-        //calc troughput
-        long mic = (end.tv_sec - start.tv_sec) * 1000000 + end.tv_usec - start.tv_usec;
-        long total_time = mic;
-        double troughput = ((double) number_of_messages * i) /(double)total_time;
-        troughputs[i] = troughput;
-    }
-    for (int i = 1; i < MEGABIT; i=i*2) {
+        troughputs[i] = send_data(client_socket, i);
         printf("\nTroughput for %d bytes is %f\n", i, troughputs[i]);
     }
 
-
+    close(client_socket);
     return 0;
 }
