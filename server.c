@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/time.h>
 #include <stdbool.h>
 #include <unistd.h>
 //What do you need to measure?
