@@ -66,7 +66,7 @@ double send_data(int client_socket, int size){
 
 
 int main(int argc, char *argv[]) {
-    printf("Running client...");
+    printf("Running client...\n");
     char* ip = argv[1];
 
     // create socket
@@ -90,5 +90,6 @@ int main(int argc, char *argv[]) {
     }
 
     close(client_socket);
+    printf("Client closed\n");
     return 0;
 }

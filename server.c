@@ -5,6 +5,7 @@
 #include <arpa/inet.h>
 #include <sys/time.h>
 #include <stdbool.h>
+#include <unistd.h>
 //What do you need to measure?
 //You need to measure throughput between two machines, for exponential series of message sizes,
 //ranging from 1 byte to 1MB. Throughput is the highest possible transmission rate with that message
@@ -60,7 +61,7 @@ void receive_data(int client_socket, int size){
 
 int main()
 {
-    printf("Running server...");
+    printf("Running server...\n");
     //create a socket
     int server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket == -1)
@@ -79,11 +80,14 @@ int main()
     //accept the connection
     int client_socket = accept(server_socket, NULL, NULL);
 
-
     for (int i = 1; i < MEGABIT; i=i*2) {
         //printf("Sending %d bytes\n", i);
         receive_data(client_socket, i);
     }
+
+    close(client_socket);
+    close(server_socket);
+    printf("Server closed\n");
     return 0;
 
 }
