@@ -26,6 +26,7 @@ int warmup(int client_socket, int sizeofpacket) {
     for (int i = 0; i < 1000; i++) {
         send(client_socket, &message, sizeofpacket, 0);
     }
+    int x;
     return 0;
 }
 
