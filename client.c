@@ -7,7 +7,7 @@
 
 
 #define SEVER_IP2 "10.0.2.15"
-#define SEVER_IP "132.65.164.101"
+#define SEVER_IP "132.164.164.101"
 #define SERVER_PORT 7005
 #define MEGABIT 1024
 
