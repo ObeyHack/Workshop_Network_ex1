@@ -8,7 +8,7 @@
 
 #define SEVER_IP "10.0.2.15"
 #define SERVER_PORT 7005
-#define MEGABIT 10000
+#define MEGABIT 100
 
 //What do you need to measure?
 //You need to measure throughput between two machines, for exponential series of message sizes,
