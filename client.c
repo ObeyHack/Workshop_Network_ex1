@@ -9,7 +9,7 @@
 #define SEVER_IP2 "10.0.2.15"
 #define SEVER_IP "132.65.164.101"
 #define SERVER_PORT 7005
-#define MEGABIT 1048576
+#define MEGABIT 1024
 
 //What do you need to measure?
 //You need to measure throughput between two machines, for exponential series of message sizes,
@@ -76,8 +76,8 @@ int main(int argc, char *argv[]) {
         double troughput = ((double) number_of_messages * i) /(double)total_time;
         troughputs[i] = troughput;
     }
-    for (int i = 1; i < MEGABIT; i++) {
-        printf("Troughput for %d bytes is %f\n", i, troughputs[i]);
+    for (int i = 1; i < MEGABIT; i=i*2) {
+        printf("\nTroughput for %d bytes is %f\n", i, troughputs[i]);
     }
 
 

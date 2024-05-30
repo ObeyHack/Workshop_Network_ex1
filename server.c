@@ -18,7 +18,7 @@
 #define SERVER_IP "10.0.2.15"
 #define CLIENT_IP "0.0.0.0"
 #define CLIENT_PORT 8081
-#define MEGABIT 100000
+#define MEGABIT 1024
 int warmup(int client_socket, int sizeofpacket) {
     char message[MEGABIT];
     for (int i = 0; i < 1000; i++) {
