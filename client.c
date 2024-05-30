@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define SERVER_PORT 7005
+#define SERVER_PORT 7777
 #define MEGABIT 1024
 #define MSG_COUNT 1000
 
@@ -26,7 +26,6 @@ int warmup(int client_socket, int sizeofpacket) {
     for (int i = 0; i < 1000; i++) {
         send(client_socket, &message, sizeofpacket, 0);
     }
-    int x;
     return 0;
 }
 
