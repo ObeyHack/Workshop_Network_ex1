@@ -6,34 +6,20 @@ The goal of this exercise is to learn how to measure point-to-point (unidirectio
 ## Makefile
 create 2 objects: **server** and **client**.
 
-## CMakelists.txt
-```CMakelists.txt
-cmake_minimum_required(VERSION 3.25)
-project(Workshop_Network_ex1 C)
-
-set(CMAKE_C_STANDARD 11)
-
-add_executable(client client.c)
-add_executable(server server.c)
-```
-
-## git clone
-```bash
-git clone https://github.com/ObeyHack/Workshop-Network-ex1.git
-```
-
-## git pull
-```bash
-git pull
-```
-
-
 ## Server IPs
 ```bash
 mlx-stud-01 - 132.65.164.101, 10.164.164.101
 mlx-stud-02 - 132.65.164.102, 10.164.164.102
 mlx-stud-03 - 132.65.164.103, 10.164.164.103
 mlx-stud-04 - 132.65.164.104, 10.164.164.104
+```
+
+## git
+```bash
+git clone https://github.com/ObeyHack/Workshop-Network-ex1.git
+```
+```bash
+git pull
 ```
 
 ## Compile
@@ -44,6 +30,19 @@ make all
 ## Run
 ```bash
 ./server 
-./client 132.65.164.101
+```
+```bash
+./client <server_ip>
 ```
 
+## Docker usage
+Follow the instructions in the following link to build the docker image and run the container.
+```link
+https://github.com/shuhaoliu/docker-clion-dev
+```
+```bash
+docker build -t liuempire/docker_clion_dev .
+```
+```bash
+docker-compose up -d
+```
