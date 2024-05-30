@@ -1,7 +1,31 @@
 # Exercise #1: Benchmarking Throughput
 
 ## Goal 
-The goal of this exercise is to learn how to measure point-to-point (unidirectional) throughput, by writing a C/C++ benchmark application on top of TCP sockets. 
+The goal of this exercise is to learn how to measure point-to-point (unidirectional) throughput, by writing a C/C++ benchmark application on top of TCP sockets.
+/home/michael/CLionProjects/Workshop-Network-ex1/cmake-build-debug/client
+Running client...
+Troughput for 1 bytes is 4.405286
+
+Troughput for 2 bytes is 8.810573
+
+Troughput for 4 bytes is 16.194332
+
+Troughput for 8 bytes is 35.087719
+
+Troughput for 16 bytes is 13.698630
+
+Troughput for 32 bytes is 131.687243
+
+Troughput for 64 bytes is 239.700375
+
+Troughput for 128 bytes is 391.437309
+
+Troughput for 256 bytes is 766.467066
+
+Troughput for 512 bytes is 1765.517241
+
+Process finished with exit code 0
+
 
 ## Makefile
 create 2 objects: **server** and **client**.
