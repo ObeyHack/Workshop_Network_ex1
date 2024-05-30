@@ -58,10 +58,10 @@ int main()
 
     int number_of_messages = 1000;
 
-    char packet[MEGABIT] = {1};
-    char recive[MEGABIT] = {1};
+    char packet[MEGABIT] = {0};
+    char recive[MEGABIT] = {0};
 
-    for (int i = 1; i < MEGABIT; i++) {
+    for (int i = 1; i < MEGABIT; i=i*2) {
         warmup(client_socket, i);
 
         for (int j = 0; j < number_of_messages; j++) {

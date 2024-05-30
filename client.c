@@ -6,9 +6,10 @@
 #include <sys/time.h>
 
 
-#define SEVER_IP "10.0.2.15"
+#define SEVER_IP2 "10.0.2.15"
+#define SEVER_IP "132.65.164.101"
 #define SERVER_PORT 7005
-#define MEGABIT 100
+#define MEGABIT 1048576
 
 //What do you need to measure?
 //You need to measure throughput between two machines, for exponential series of message sizes,
@@ -58,7 +59,7 @@ int main(int argc, char *argv[]) {
     char packet[MEGABIT] = {0};
     char recive[MEGABIT] = {0};
 
-    for (int i = 1; i < MEGABIT; i++) {
+    for (int i = 1; i < MEGABIT; i=i*2) {
         //printf("Sending %d bytes\n", i);
         warmup(client_socket, i);
         gettimeofday(&start, NULL);
