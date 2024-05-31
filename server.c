@@ -23,7 +23,7 @@
 
 int warmup(int client_socket, size_t size_of_packet, char* buffer) {
     for (int i = 0; i < ITERATIONS; i++) {
-        recv(client_socket, buffer, size_of_packet, 0);
+        recv(client_socket, buffer, size_of_packet, MSG_WAITALL);
     }
     return 0;
 }
@@ -47,7 +47,7 @@ bool bind_server(int server_socket) {
 void receive_data(int client_socket, size_t  size, char* buffer){
     warmup(client_socket, size, buffer);
     for (long j = 0; j < MSG_COUNT; j++) {
-        recv(client_socket, buffer, size, 0);
+        recv(client_socket, buffer, size, MSG_WAITALL);
         //printf("Received %d bytes %d\n", i, j);
     }
     //send the reply
@@ -70,19 +70,19 @@ int main()
         printf("Error binding socket\n");
         exit(1);
     }
-
-    //listen for connections
-    listen(server_socket, 1);
-    //accept the connection
-    int client_socket = accept(server_socket, NULL, NULL);
-
     char* buffer = (char*) malloc(MEGABIT);
     if (buffer == NULL) {
         printf("Error allocating memory\n");
         exit(1);
     }
 
-    for (size_t i = 1; i < MEGABIT; i=i*2) {
+    //listen for connections
+    listen(server_socket, 1);
+    //accept the connection
+    int client_socket = accept(server_socket, NULL, NULL);
+
+
+    for (size_t i = 1; i <= MEGABIT; i=i*2) {
         //printf("Sending %d bytes\n", i);
         receive_data(client_socket, i, buffer);
     }

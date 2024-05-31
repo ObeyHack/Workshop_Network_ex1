@@ -36,7 +36,7 @@ bool connect_to_server(int client_socket, char* ip) {
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(SERVER_PORT);
     server_address.sin_addr.s_addr = inet_addr(ip);
-    int connection_status = connect(client_socket, (struct sockaddr *) &server_address, sizeof(server_address));
+    int connection_status = connect(client_socket, (struct sockaddr*) &server_address, sizeof(server_address));
     if (connection_status != -1) {
         printf("Connected to server\n");
         return true;
@@ -55,10 +55,10 @@ double send_data(int client_socket, size_t size, char* buffer) {
 
     recv(client_socket, buffer, size, 0);
     gettimeofday(&end, NULL);
-    //calc troughput
+    //calc throughput
     long total_time = (end.tv_sec - start.tv_sec) * 1000000 + end.tv_usec - start.tv_usec;
-    double troughput = ((double) MSG_COUNT * size) /(double)total_time;
-    return troughput;
+    double throughput = ((double) MSG_COUNT * size) /(double)total_time;
+    return throughput;
 }
 
 
@@ -84,24 +84,24 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    printf("Interval is %d\n", ITERATIONS);
+    printf("Interval is %d\n\n", ITERATIONS);
     //send message to sever
-    double* troughputs = (double*) malloc((MEGA_POWER+1) * sizeof(double));
-    double avg_troughput = 0;
+    double* throughputs = (double*) malloc((MEGA_POWER+1) * sizeof(double));
+    double avg_throughput = 0;
     int index = 0;
-    for (size_t i = 1; i < MEGABIT; i=i*2) {
+    for (size_t i = 1; i <= MEGABIT; i=i*2) {
         //printf("Sending %d bytes\n", i);
-        troughputs[index] = send_data(client_socket, i, buffer);
-        printf("Troughput for %lu bytes is %f\n", i, troughputs[index]);
-        avg_troughput += troughputs[index];
+        throughputs[index] = send_data(client_socket, i, buffer);
+        printf("Throughput for %lu bytes is %f\n", i, throughputs[index]);
+        avg_throughput += throughputs[index];
         index++;
     }
-    avg_troughput = avg_troughput / MEGA_POWER;
-    printf("\nAverage troughput is %f\n", avg_troughput);
+    avg_throughput = avg_throughput / MEGA_POWER;
+    printf("Average throughput is %f\n\n", avg_throughput);
 
     //close
     free(buffer);
-    free(troughputs);
+    free(throughputs);
     close(client_socket);
     printf("Client closed\n");
     return 0;
