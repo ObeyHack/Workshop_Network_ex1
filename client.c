@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
 
     printf("Interval is %d\n", ITERATIONS);
     //send message to sever
-    double* troughputs = (double*) malloc(MEGA_POWER * sizeof(double));
+    double* troughputs = (double*) malloc((MEGA_POWER+1) * sizeof(double));
     double avg_troughput = 0;
     int index = 0;
     for (size_t i = 1; i < MEGABIT; i=i*2) {
