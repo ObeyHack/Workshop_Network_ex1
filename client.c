@@ -7,9 +7,10 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define SERVER_PORT 7777
-#define MEGABIT 1024
+#define SERVER_PORT 8123
+#define MEGABIT 1048576
 #define MSG_COUNT 1000
+#define ITERATIONS 1000
 
 //What do you need to measure?
 //You need to measure throughput between two machines, for exponential series of message sizes,
@@ -21,10 +22,9 @@
 //and sends X messages (you decide how many, and explain your decision in a comment inside the code),
 //the server replies after all X have arrived, and the client calculates the throughput based on the time it
 //all took (you can ignore the reply in your calculation)
-int warmup(int client_socket, int sizeofpacket) {
-    char message[MEGABIT];
-    for (int i = 0; i < 1000; i++) {
-        send(client_socket, &message, sizeofpacket, 0);
+int warmup(int client_socket, int sizeofpacket, char* buffer) {
+    for (int i = 0; i < ITERATIONS; i++) {
+        send(client_socket, buffer, sizeofpacket, 0);
     }
     return 0;
 }
@@ -44,19 +44,15 @@ bool connect_to_server(int client_socket, char* ip) {
 }
 
 
-double send_data(int client_socket, int size){
+double send_data(int client_socket, int size, char* buffer){
     struct timeval start, end;
-    char packet[MEGABIT] = {0};
-    char recive[MEGABIT] = {0};
-
-
-    warmup(client_socket, size);
+    warmup(client_socket, size, buffer);
     gettimeofday(&start, NULL);
     for (int j = 0; j < MSG_COUNT; j++) {
-        send(client_socket, packet, size, 0);
+        send(client_socket, buffer, size, 0);
     }
-    //receive the reply
-    recv(client_socket, recive, size, 0);
+
+    recv(client_socket, buffer, size, 0);
     gettimeofday(&end, NULL);
     //calc troughput
     long total_time = (end.tv_sec - start.tv_sec) * 1000000 + end.tv_usec - start.tv_usec;
@@ -81,14 +77,23 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    char* buffer = (char*) malloc(MEGABIT);
+    if (buffer == NULL) {
+        printf("Error allocating memory\n");
+        exit(1);
+    }
+
     //send message to sever
-    double troughputs[MEGABIT] = {0};
+    double* troughputs = (double*) malloc(MEGABIT);
     for (int i = 1; i < MEGABIT; i=i*2) {
         //printf("Sending %d bytes\n", i);
-        troughputs[i] = send_data(client_socket, i);
+        troughputs[i] = send_data(client_socket, i, buffer);
         printf("\nTroughput for %d bytes is %f\n", i, troughputs[i]);
     }
 
+    //close
+    free(buffer);
+    free(troughputs);
     close(client_socket);
     printf("Client closed\n");
     return 0;

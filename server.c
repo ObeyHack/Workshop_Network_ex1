@@ -15,14 +15,15 @@
 //the server replies after all X have arrived, and the client calculates the throughput based on the time it
 //all took (you can ignore the reply in your calculation)
 
-#define SERVER_PORT 7777
-#define MEGABIT 1024
+#define SERVER_PORT 8123
+#define MEGABIT 1048576
 #define MSG_COUNT 1000
+#define ITERATIONS 1000
 
-int warmup(int client_socket, int size_of_packet) {
-    char message[MEGABIT];
-    for (int i = 0; i < 1000; i++) {
-        recv(client_socket, &message, size_of_packet, 0);
+
+int warmup(int client_socket, int size_of_packet, char* buffer) {
+    for (int i = 0; i < ITERATIONS; i++) {
+        recv(client_socket, buffer, size_of_packet, 0);
     }
     return 0;
 }
@@ -43,17 +44,14 @@ bool bind_server(int server_socket) {
 }
 
 
-void receive_data(int client_socket, int size){
-    char packet[MEGABIT] = {0};
-    char recive[MEGABIT] = {0};
-    warmup(client_socket, size);
-
+void receive_data(int client_socket, int size, char* buffer){
+    warmup(client_socket, size, buffer);
     for (int j = 0; j < MSG_COUNT; j++) {
-        recv(client_socket, packet, size, 0);
+        recv(client_socket, buffer, size, 0);
         //printf("Received %d bytes %d\n", i, j);
     }
     //send the reply
-    send(client_socket, recive, size, 0);
+    send(client_socket, buffer, size, 0);
 }
 
 
@@ -78,11 +76,20 @@ int main()
     //accept the connection
     int client_socket = accept(server_socket, NULL, NULL);
 
-    for (int i = 1; i < MEGABIT; i=i*2) {
-        //printf("Sending %d bytes\n", i);
-        receive_data(client_socket, i);
+    char* buffer = (char*) malloc(MEGABIT);
+    if (buffer == NULL) {
+        printf("Error allocating memory\n");
+        exit(1);
     }
 
+    for (int i = 1; i < MEGABIT; i=i*2) {
+        //printf("Sending %d bytes\n", i);
+        receive_data(client_socket, i, buffer);
+    }
+
+
+    // close
+    free(buffer);
     close(client_socket);
     close(server_socket);
     printf("Server closed\n");
