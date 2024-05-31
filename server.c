@@ -21,7 +21,7 @@
 #define ITERATIONS 1000
 
 
-int warmup(int client_socket, int size_of_packet, char* buffer) {
+int warmup(int client_socket, size_t size_of_packet, char* buffer) {
     for (int i = 0; i < ITERATIONS; i++) {
         recv(client_socket, buffer, size_of_packet, 0);
     }
@@ -44,9 +44,9 @@ bool bind_server(int server_socket) {
 }
 
 
-void receive_data(int client_socket, int size, char* buffer){
+void receive_data(int client_socket, size_t  size, char* buffer){
     warmup(client_socket, size, buffer);
-    for (int j = 0; j < MSG_COUNT; j++) {
+    for (long j = 0; j < MSG_COUNT; j++) {
         recv(client_socket, buffer, size, 0);
         //printf("Received %d bytes %d\n", i, j);
     }
@@ -82,11 +82,10 @@ int main()
         exit(1);
     }
 
-    for (int i = 1; i < MEGABIT; i=i*2) {
+    for (size_t i = 1; i < MEGABIT; i=i*2) {
         //printf("Sending %d bytes\n", i);
         receive_data(client_socket, i, buffer);
     }
-
 
     // close
     free(buffer);

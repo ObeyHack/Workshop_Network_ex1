@@ -9,6 +9,7 @@
 
 #define SERVER_PORT 8123
 #define MEGABIT 1048576
+#define MEGA_POWER 20
 #define MSG_COUNT 1000
 #define ITERATIONS 1000
 
@@ -22,9 +23,9 @@
 //and sends X messages (you decide how many, and explain your decision in a comment inside the code),
 //the server replies after all X have arrived, and the client calculates the throughput based on the time it
 //all took (you can ignore the reply in your calculation)
-int warmup(int client_socket, int sizeofpacket, char* buffer) {
+int warmup(int client_socket, size_t  size_of_packet, char* buffer) {
     for (int i = 0; i < ITERATIONS; i++) {
-        send(client_socket, buffer, sizeofpacket, 0);
+        send(client_socket, buffer, size_of_packet, 0);
     }
     return 0;
 }
@@ -44,7 +45,7 @@ bool connect_to_server(int client_socket, char* ip) {
 }
 
 
-double send_data(int client_socket, int size, char* buffer){
+double send_data(int client_socket, size_t size, char* buffer) {
     struct timeval start, end;
     warmup(client_socket, size, buffer);
     gettimeofday(&start, NULL);
@@ -83,13 +84,20 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    printf("Interval is %d\n", ITERATIONS);
     //send message to sever
-    double* troughputs = (double*) malloc(MEGABIT);
-    for (int i = 1; i < MEGABIT; i=i*2) {
+    double* troughputs = (double*) malloc(MEGA_POWER * sizeof(double));
+    double avg_troughput = 0;
+    int index = 0;
+    for (size_t i = 1; i < MEGABIT; i=i*2) {
         //printf("Sending %d bytes\n", i);
-        troughputs[i] = send_data(client_socket, i, buffer);
-        printf("\nTroughput for %d bytes is %f\n", i, troughputs[i]);
+        troughputs[index] = send_data(client_socket, i, buffer);
+        printf("Troughput for %lu bytes is %f\n", i, troughputs[index]);
+        avg_troughput += troughputs[index];
+        index++;
     }
+    avg_troughput = avg_troughput / MEGA_POWER;
+    printf("\nAverage troughput is %f\n", avg_troughput);
 
     //close
     free(buffer);
