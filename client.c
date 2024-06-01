@@ -11,7 +11,7 @@
 #define MEGABIT 1048576
 #define MEGA_POWER 20
 #define MSG_COUNT 1000
-#define ITERATIONS 1000
+#define ITERATIONS 500
 
 //What do you need to measure?
 //You need to measure throughput between two machines, for exponential series of message sizes,
