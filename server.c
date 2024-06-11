@@ -15,7 +15,7 @@
 //the server replies after all X have arrived, and the client calculates the throughput based on the time it
 //all took (you can ignore the reply in your calculation)
 
-#define SERVER_PORT 8123
+#define SERVER_PORT 8250
 #define MEGABIT 1048576
 #define MSG_COUNT 1000
 #define ITERATIONS 500
@@ -44,14 +44,14 @@ bool bind_server(int server_socket) {
 }
 
 
-void receive_data(int client_socket, size_t  size, char* buffer){
+void receive_data(int client_socket, size_t size, char* buffer){
     warmup(client_socket, size, buffer);
     for (long j = 0; j < MSG_COUNT; j++) {
         recv(client_socket, buffer, size, MSG_WAITALL);
-        //printf("Received %d bytes %d\n", i, j);
     }
+
     //send the reply
-    send(client_socket, buffer, size, 0);
+    send(client_socket, buffer, 1, 0);
 }
 
 

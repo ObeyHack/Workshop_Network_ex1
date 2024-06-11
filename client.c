@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define SERVER_PORT 8123
+#define SERVER_PORT 8250
 #define MEGABIT 1048576
 #define MEGA_POWER 20
 #define MSG_COUNT 1000
@@ -53,11 +53,15 @@ double send_data(int client_socket, size_t size, char* buffer) {
         send(client_socket, buffer, size, 0);
     }
 
-    recv(client_socket, buffer, size, 0);
+    recv(client_socket, buffer, 1, MSG_WAITALL);
     gettimeofday(&end, NULL);
+
     //calc throughput
-    long total_time = (end.tv_sec - start.tv_sec) * 1000000 + end.tv_usec - start.tv_usec;
-    double throughput = ((double) MSG_COUNT * size) /(double)total_time;
+    long second2micro = (end.tv_sec - start.tv_sec) * 1000000;
+    long microseconds = (end.tv_usec - start.tv_usec) + second2micro;
+    double total_time = (double) microseconds;
+    double data = (double) size * (double) MSG_COUNT;
+    double throughput = (data / total_time);
     return throughput;
 }
 
@@ -92,12 +96,14 @@ int main(int argc, char *argv[]) {
     for (size_t i = 1; i <= MEGABIT; i=i*2) {
         //printf("Sending %d bytes\n", i);
         throughputs[index] = send_data(client_socket, i, buffer);
-        printf("Throughput for %lu bytes is %f\n", i, throughputs[index]);
+
+        // format: i tab throughput tab Bytes/microsecond
+        printf("%d\t%f\tBytes/microsecond\n", i, throughputs[index]);
         avg_throughput += throughputs[index];
         index++;
     }
     avg_throughput = avg_throughput / MEGA_POWER;
-    printf("Average throughput is %f\n\n", avg_throughput);
+    printf("\nAverage throughput is %f [Bytes/microsecond]\n", avg_throughput);
 
     //close
     free(buffer);
