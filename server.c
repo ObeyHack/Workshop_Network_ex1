@@ -15,7 +15,7 @@
 //the server replies after all X have arrived, and the client calculates the throughput based on the time it
 //all took (you can ignore the reply in your calculation)
 
-#define SERVER_PORT 8250
+#define SERVER_PORT 8251
 #define MEGABIT 1048576
 #define MSG_COUNT 1000
 #define ITERATIONS 500

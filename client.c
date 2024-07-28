@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define SERVER_PORT 8250
+#define SERVER_PORT 8251
 #define MEGABIT 1048576
 #define MEGA_POWER 20
 #define MSG_COUNT 1000
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
         index++;
     }
     avg_throughput = avg_throughput / MEGA_POWER;
-    printf("\nAverage throughput is %f [Bytes/microsecond]\n", avg_throughput);
+    //printf("\nAverage throughput is %f [Bytes/microsecond]\n", avg_throughput);
 
     //close
     free(buffer);
