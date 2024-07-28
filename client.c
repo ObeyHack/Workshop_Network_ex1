@@ -46,6 +46,7 @@ bool connect_to_server(int client_socket, char* ip) {
 
 
 double send_data(int client_socket, size_t size, char* buffer) {
+
     struct timeval start, end;
     warmup(client_socket, size, buffer);
     gettimeofday(&start, NULL);
@@ -61,6 +62,7 @@ double send_data(int client_socket, size_t size, char* buffer) {
     long microseconds = (end.tv_usec - start.tv_usec) + second2micro;
     double total_time = (double) microseconds;
     double data = (double) size * (double) MSG_COUNT;
+    // Bytes / microseconds = MB / seconds
     double throughput = (data / total_time);
     return throughput;
 }
@@ -98,7 +100,8 @@ int main(int argc, char *argv[]) {
         throughputs[index] = send_data(client_socket, i, buffer);
 
         // format: i tab throughput tab Bytes/microsecond
-        printf("%d\t%f\tBytes/microsecond\n", i, throughputs[index]);
+        //printf("%f\n", throughputs[index]);
+        printf("%d\t%f\tMB/s\n", i, throughputs[index]);
         avg_throughput += throughputs[index];
         index++;
     }
