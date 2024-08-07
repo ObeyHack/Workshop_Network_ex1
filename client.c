@@ -7,11 +7,11 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define SERVER_PORT 8251
+#define SERVER_PORT 8253
 #define MEGABIT 1048576
 #define MEGA_POWER 20
 #define MSG_COUNT 1000
-#define ITERATIONS 500
+#define ITERATIONS 100
 
 //What do you need to measure?
 //You need to measure throughput between two machines, for exponential series of message sizes,
@@ -19,7 +19,7 @@
 //size.
 //How to measure throughput?
 //In order to measure throughput you need code both for a server and a client (try to make them share as
-//much code as possible). You run your server first and the client second, the client connects to the server
+//much code as possible). You run your server fir   st and the client second, the client connects to the server
 //and sends X messages (you decide how many, and explain your decision in a comment inside the code),
 //the server replies after all X have arrived, and the client calculates the throughput based on the time it
 //all took (you can ignore the reply in your calculation)
@@ -62,8 +62,10 @@ double send_data(int client_socket, size_t size, char* buffer) {
     long microseconds = (end.tv_usec - start.tv_usec) + second2micro;
     double total_time = (double) microseconds;
     double data = (double) size * (double) MSG_COUNT;
-    // Bytes / microseconds = MB / seconds
+    // Bytes / microseconds = MBytes / seconds
     double throughput = (data / total_time);
+    // Mbit / s = (MByte / s) * 8
+    throughput = throughput * 8;
     return throughput;
 }
 
@@ -93,7 +95,6 @@ int main(int argc, char *argv[]) {
     printf("Interval is %d\n\n", ITERATIONS);
     //send message to sever
     double* throughputs = (double*) malloc((MEGA_POWER+1) * sizeof(double));
-    double avg_throughput = 0;
     int index = 0;
     for (size_t i = 1; i <= MEGABIT; i=i*2) {
         //printf("Sending %d bytes\n", i);
@@ -101,11 +102,9 @@ int main(int argc, char *argv[]) {
 
         // format: i tab throughput tab Bytes/microsecond
         //printf("%f\n", throughputs[index]);
-        printf("%d\t%f\tMB/s\n", i, throughputs[index]);
-        avg_throughput += throughputs[index];
+        printf("%d\t%f\tMbit/s\n", i, throughputs[index]);
         index++;
     }
-    avg_throughput = avg_throughput / MEGA_POWER;
     //printf("\nAverage throughput is %f [Bytes/microsecond]\n", avg_throughput);
 
     //close

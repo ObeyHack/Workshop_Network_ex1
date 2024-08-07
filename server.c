@@ -15,10 +15,10 @@
 //the server replies after all X have arrived, and the client calculates the throughput based on the time it
 //all took (you can ignore the reply in your calculation)
 
-#define SERVER_PORT 8251
+#define SERVER_PORT 8253
 #define MEGABIT 1048576
 #define MSG_COUNT 1000
-#define ITERATIONS 500
+#define ITERATIONS 100
 
 
 int warmup(int client_socket, size_t size_of_packet, char* buffer) {
